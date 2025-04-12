@@ -11,7 +11,6 @@ function choosePage(item) {
 
 <template>
   <div class="flex justify-center gap-6">
-    // Использовать RouterLink ??
     <div v-for="item in menuItems" @click="choosePage(item)">
       {{ item }}
     </div>
