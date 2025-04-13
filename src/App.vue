@@ -15,7 +15,7 @@ const menuItems = [
       v-for="item in menuItems"
       :to="{ name: item.routeName }"
       class="font-sans font-medium"
-      activeClass="text-gray-50"
+      activeClass="text-purple-400"
     >
       {{ item.title }}
     </RouterLink>
