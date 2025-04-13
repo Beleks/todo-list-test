@@ -1,82 +1,55 @@
 <script setup>
-import { onMounted, ref, useTemplateRef, watch } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useSettingsStore } from '@/stores/settings.js'
+
 import IconCircle from '@/components/icons/IconCircle.vue'
 import IconCheck from '@/components/icons/IconCheck.vue'
-
-const taskContentArea = useTemplateRef('taskContentArea')
+import IconTrash from '@/components/icons/IconTrash.vue'
+import TaskForm from '@/components/TaskForm.vue'
+import IconEdit from '@/components/icons/IconEdit.vue'
 
 // const taskContent = ref('')
 
-const taskPriorities= ref({
-  1: {
-    title: 'Низкий',
-    class: 'stroke-blue-400',
-    activeClass: 'text-blue-400',
-  },
-  2: {
-    title: 'Средний',
-    class: 'stroke-yellow-400',
-    activeClass: 'text-yellow-400',
-  },
-  3: {
-    title: 'Высокий',
-    class: 'stroke-red-400',
-    activeClass: 'text-red-400',
-  },
-})
+const settingsStore = useSettingsStore()
 
-const newTask = ref(initEmptyTask())
-const isEdite = ref(false)
+const editTaskId = ref(null)
 
 const taskList = ref([])
 
-watch(isEdite, (newValueIsEdite) => {
-  if (!newValueIsEdite) {
-    newTask.value = initEmptyTask()
-  }
-})
-
-function initEmptyTask() {
-  // priorityId -> priorityKey?
-  return {
-    content: '',
-    priorityId: '1',
-    isReady: false,
-  }
+function showTaskForm(taskId) {
+  editTaskId.value = taskId
 }
 
-function choosePriority(priorityId) {
-  newTask.value.priorityId = priorityId
+function cancelChange() {
+  editTaskId.value = null
 }
 
-function onFocus() {
-  isEdite.value = true
-}
+function saveEditTask(newTask) {
 
-function cancelEdit() {
-  isEdite.value = false
 }
 
 function createTask(task) {
-  if (!task.content.length) {
+  task.id = generateId()
+  taskList.value.unshift(task)
+  saveTaskListToLS(taskList.value)
+}
+
+function saveTaskListToLS(taskList) {
+  localStorage.setItem('tasks', JSON.stringify(taskList))
+}
+
+function deleteTask(taskId) {
+  let currentTaskIndex = taskList.value.findIndex((task) => task.id === taskId)
+  if (currentTaskIndex === -1) {
     return
   }
 
-  // TODO: Убрать лишние пробелы, переносы строк?
-  // create...
-  taskList.value.unshift(task)
-
-  // taskList.value.splice(0, 0, task)
-  localStorage.setItem('tasks', JSON.stringify(taskList.value))
-
-  newTask.value = initEmptyTask()
+  taskList.value.splice(currentTaskIndex, 1)
+  saveTaskListToLS(taskList.value)
 }
 
-function adjustHeight(event) {
-  // Сброс высоты, чтобы корректно вычислить новую высоту
-  event.target.style.height = 'auto'
-  // Установка новой высоты на основе содержимого
-  event.target.style.height = `${event.target.scrollHeight}px`
+function generateId() {
+  return 'id-' + Date.now() + '-' + Math.floor(Math.random() * 1000)
 }
 
 onMounted(() => {
@@ -92,58 +65,41 @@ onMounted(() => {
   <div>Поиск</div>
   <div>Фильтры</div>
   <div class="flex gap-2.5">
-    <div class="">
-      <IconCheck :size="26" />
-    </div>
-    <div class="p-2.5 border border-gray-400 rounded-sm w-full" :class="{ 'border-dashed': isEdite }">
-        <!-- Без p-0 Placeholder изначально не видно FIXED? -->
-        <textarea
-          ref="taskContentArea"
-          class="block w-full placeholder:text-gray-400 focus:border-none outline-none resize-none"
-          placeholder="Введите название задачи..."
-          rows="1"
-          @input="adjustHeight"
-          @keyup.alt.enter="createTask(newTask)"
-          @focus="onFocus"
-          v-model="newTask.content"
-        ></textarea>
-      <div v-if="isEdite" class="flex items-center justify-between leading-4 mt-2.5">
-        <div class="flex gap-2.5">
-          Приоритет:
-          <div
-            v-for="(priority, key) in taskPriorities"
-            @click="choosePriority(key)"
-            :class="[newTask.priorityId === key ? priority.activeClass : '']"
-            class="cursor-pointer"
-          >
-            {{ priority.title }}
-          </div>
-        </div>
-        <div class="flex gap-2.5 items-center font-medium">
-          <button class="p-2.5 bg-gray-800 rounded-sm cursor-pointer" @click="cancelEdit">
-            Отмена
-          </button>
-          <button
-            class="p-2.5 bg-purple-400 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="!newTask.content"
-            @click="createTask(newTask)"
-          >
-            Добавить задачу
-          </button>
-        </div>
-      </div>
-    </div>
+    <IconCheck :size="26" />
+    <TaskForm @createTask="createTask"></TaskForm>
   </div>
   <div>
     <div class="mt-4" v-for="task in taskList">
-      <div class="flex gap-2.5 items-center" :class="[taskPriorities[task.priorityId].class]">
-        <div class="cursor-pointer">
-          <IconCheck v-if="task.isReady" @click="task.isReady = !task.isReady" :size="26" />
-          <IconCircle v-else @click="task.isReady = !task.isReady" :size="26" />
-        </div>
-        <div class="p-2.5 border border-gray-400 rounded-sm w-full">
-          {{ task.content }}
-        </div>
+      <div
+        class="flex gap-2.5 items-center"
+      >
+        <template v-if="editTaskId === task.id">
+          <IconCheck :size="26" />
+          <TaskForm isEdit :task="task" @cancelChange="cancelChange" @editTask="saveEditTask"></TaskForm>
+        </template>
+        <template v-else>
+          <div class="cursor-pointer" :class="[settingsStore.taskPriorities[task.priorityId].class]">
+            <IconCheck v-if="task.isReady" @click="task.isReady = !task.isReady" :size="26" />
+            <IconCircle v-else @click="task.isReady = !task.isReady" :size="26" />
+          </div>
+          <div class="flex justify-between p-2.5 border border-gray-400 rounded-sm w-full">
+            <div>
+              {{ task.content }}
+            </div>
+            <div class="flex gap-2.5">
+              <IconEdit
+                :size="24"
+                class="stroke-purple-400 cursor-pointer"
+                @click="showTaskForm(task.id)"
+              />
+              <IconTrash
+                :size="24"
+                class="stroke-red-400 cursor-pointer"
+                @click="deleteTask(task.id)"
+              />
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </div>
