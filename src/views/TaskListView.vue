@@ -33,8 +33,6 @@ const taskList = ref([])
 watch(isEdite, (newValueIsEdite) => {
   if (!newValueIsEdite) {
     newTask.value = initEmptyTask()
-    // Нужно ли терять с input фокус? Для удобства вродебы нет
-    // taskContentArea.value.blur()
   }
 })
 
