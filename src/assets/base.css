@@ -1,10 +1,7 @@
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-  }
+  --toastify-color-success: var(--color-purple-400);
+  --toastify-color-dark: var(--color-gray-900);
 }
 
 *,
@@ -18,7 +15,7 @@ body {
   min-height: 100vh;
   color: var(--color-gray-50);
   background: var(--color-gray-950);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
+  /*transition:*/
+  /*  color 0.5s,*/
+  /*  background-color 0.5s;*/
 }

@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+import { toast } from 'vue3-toastify'
 import { useSettingsStore } from '@/stores/settings.js'
 import { debounce } from '@/helpers/helper.js'
 
@@ -8,11 +9,12 @@ import IconCheck from '@/components/icons/IconCheck.vue'
 import IconTrash from '@/components/icons/IconTrash.vue'
 import IconEdit from '@/components/icons/IconEdit.vue'
 import TaskForm from '@/components/TaskForm.vue'
+import IconPriority from '@/components/icons/IconPriority.vue'
 
 const settingsStore = useSettingsStore()
 
 const filters = ref({
-  priorities: new Set(['1', '2']),
+  priorities: new Set(['2', '3']),
   statusType: 'all',
 })
 
@@ -72,7 +74,7 @@ const slicedTaskArray = computed(() => {
   return filteredTasks.value.slice(start, end)
 })
 
-watch(slicedTaskArray, (newTaskArray)=>{
+watch(slicedTaskArray, (newTaskArray) => {
   // Для перехода на предыдущую страницу, если на текущей нет задач
   if (newTaskArray.length === 0 && currentPage.value !== 1) {
     currentPage.value = currentPage.value - 1
@@ -117,6 +119,11 @@ function createTask(task) {
   saveTaskListToLS(taskList.value)
 }
 
+function completeTask(task) {
+  task.isReady = true
+  toast.success('Задача выполнена!')
+}
+
 function saveTaskListToLS(taskList) {
   localStorage.setItem('tasks', JSON.stringify(taskList))
 }
@@ -127,6 +134,7 @@ function deleteTask(taskId) {
     return
   }
 
+  toast('Задача удалена')
   taskList.value.splice(currentTaskIndex, 1)
   saveTaskListToLS(taskList.value)
 }
@@ -161,18 +169,31 @@ onMounted(() => {
     <!--      Поиск-->
     <!--    </button>-->
   </div>
-  <div class="mt-2.5 ml-9 flex justify-between">
+  <div class="mt-2.5 ml-9 flex justify-between border-gray-400">
     <div>Фильтры:</div>
-    <div class="flex gap-2.5">
+    <div class="flex gap-2.5 items-stretch text-sm">
       <div
         v-for="(priority, key) in settingsStore.taskPriorities"
         @click="changePrioritiesFilter(key)"
-        :class="[filters.priorities.has(key) ? priority.activeClass : '']"
+        class="flex items-center gap-1.5 cursor-pointer border py-1 px-2.5 rounded-sm"
+        :class="[filters.priorities.has(key) ? priority.activeClass : 'border-gray-400']"
       >
+        <IconPriority
+          :class="[filters.priorities.has(key) ? priority.class : 'stroke-gray-400']"
+          class="stroke-1"
+          :size="20"
+        />
         {{ priority.title }}
       </div>
-      <div v-for="(status, key) in settingsStore.statusTypes" @click="changeStatusFilter(key)">
-        {{ status.title }}
+      <div class="flex border rounded-sm divide-x border-gray-400">
+        <div
+          class="py-1 px-2.5 cursor-pointer border-gray-400"
+          :class="[filters.statusType === key ? 'text-purple-400 ' : '']"
+          v-for="(status, key) in settingsStore.statusTypes"
+          @click="changeStatusFilter(key)"
+        >
+          {{ status.title }}
+        </div>
       </div>
     </div>
   </div>
@@ -194,17 +215,17 @@ onMounted(() => {
         </template>
         <template v-else>
           <div
-            class="cursor-pointer"
+            class="cursor-pointer stroke-2"
             :class="[settingsStore.taskPriorities[task.priorityId].class]"
           >
-            <IconCheck v-if="task.isReady" @click="task.isReady = !task.isReady" :size="26" />
-            <IconCircle v-else @click="task.isReady = !task.isReady" :size="26" />
+            <IconCheck v-if="task.isReady" @click="task.isReady = false" :size="26" />
+            <IconCircle v-else @click="completeTask(task)" :size="26" />
           </div>
           <div class="flex justify-between p-2.5 border border-gray-400 rounded-sm w-full">
             <div>
               {{ task.content }}
             </div>
-            <div class="flex gap-2.5">
+            <div class="flex gap-2.5 stroke-2">
               <IconEdit
                 :size="24"
                 class="stroke-purple-400 cursor-pointer"
@@ -230,6 +251,7 @@ onMounted(() => {
       >
         <
       </button>
+      <!-- TODO: Ограничения по кол-ву видимых страниц? -->
       <div
         class="p-2.5 text-center"
         :class="[currentPage === page ? 'bg-purple-400' : '']"

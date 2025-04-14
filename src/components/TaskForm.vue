@@ -4,6 +4,7 @@
 import { nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { useSettingsStore } from '@/stores/settings.js'
 import { initEmptyTask } from '@/helpers/helper.js'
+import IconPriority from '@/components/icons/IconPriority.vue'
 
 const props = defineProps({
   isEdit: {
@@ -55,6 +56,12 @@ async function confirmChange(task) {
   }
 }
 
+function handleKeyupCode(event) {
+  if (Object.keys(settingsStore.taskPriorities).includes(event.key)) {
+    choosePriority(event.key)
+  }
+}
+
 onMounted(() => {
   // newTask.value = { ...props.task }
   adjustHeight(taskContentArea.value)
@@ -74,23 +81,31 @@ onMounted(() => {
       rows="1"
       @input="adjustHeight(taskContentArea)"
       @keyup.alt.enter="confirmChange(newTask)"
+      @keyup.alt="handleKeyupCode"
       v-model="newTask.content"
     ></textarea>
     <div class="flex items-center justify-between leading-4 mt-2.5">
-      <div class="flex gap-2.5">
+      <div class="flex items-center gap-2.5">
         Приоритет:
         <div
           v-for="(priority, key) in settingsStore.taskPriorities"
           @click="choosePriority(key)"
-          :class="[newTask.priorityId === key ? priority.activeClass : '']"
-          class="cursor-pointer"
+          :class="[
+            newTask.priorityId === key ? priority.activeClass : 'border-gray-400 bg-gray-900',
+          ]"
+          class="flex items-center gap-1.5 cursor-pointer text-sm border p-1 px-2.5 rounded-sm"
         >
+          <IconPriority
+            :class="[newTask.priorityId === key ? priority.class : 'stroke-gray-400']"
+            class="stroke-1"
+            :size="20"
+          />
           {{ priority.title }}
         </div>
       </div>
       <div class="flex gap-2.5 items-center font-medium">
         <!-- один метод confirmChange? -->
-        <button class="p-2.5 bg-gray-800 rounded-sm cursor-pointer" @click="cancelChange">
+        <button v-if="isEdit" class="p-2.5 bg-gray-800 rounded-sm cursor-pointer" @click="cancelChange">
           Отмена
         </button>
         <button

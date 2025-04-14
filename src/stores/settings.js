@@ -21,23 +21,23 @@ export const useSettingsStore = defineStore('settings', () => {
   })
 
   const statusTypes = ref({
-    'all': {
+    all: {
       title: 'Все задачи',
       checkQuality() {
         return true
-      }
+      },
     },
-    'active': {
+    active: {
       title: 'Активные',
       checkQuality(task) {
         return !task.isReady
-      }
+      },
     },
-    'completed': {
+    completed: {
       title: 'Завершенные',
       checkQuality(task) {
         return task.isReady
-      }
+      },
     },
   })
 
