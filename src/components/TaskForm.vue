@@ -84,16 +84,16 @@ onMounted(() => {
       @keyup.alt="handleKeyupCode"
       v-model="newTask.content"
     ></textarea>
-    <div class="flex items-center justify-between leading-4 mt-2.5">
-      <div class="flex items-center gap-2.5">
-        Приоритет:
+    <div class="flex flex-col gap-1.5 items-stretch justify-between leading-4 mt-2.5 lg:flex-row">
+      <div class="flex items-center w-full lg:w-fit gap-1 sm:gap-2.5">
+        <div class="hidden lg:block">Приоритет:</div>
         <div
           v-for="(priority, key) in settingsStore.taskPriorities"
           @click="choosePriority(key)"
           :class="[
             newTask.priorityId === key ? priority.activeClass : 'border-gray-400 bg-gray-900',
           ]"
-          class="flex items-center gap-1.5 cursor-pointer text-sm border p-1 px-2.5 rounded-sm"
+          class="flex grow justify-center items-center gap-1 sm:gap-1.5 cursor-pointer text-sm border p-1 px-1 sm:px-2.5 rounded-sm"
         >
           <IconPriority
             :class="[newTask.priorityId === key ? priority.class : 'stroke-gray-400']"
@@ -103,13 +103,13 @@ onMounted(() => {
           {{ priority.title }}
         </div>
       </div>
-      <div class="flex gap-2.5 items-center font-medium">
+      <div class="flex gap-1 sm:gap-2.5 items-center font-medium w-full lg:w-fit">
         <!-- один метод confirmChange? -->
-        <button v-if="isEdit" class="p-2.5 bg-gray-800 rounded-sm cursor-pointer" @click="cancelChange">
+        <button v-if="isEdit" class="p-2.5 grow bg-gray-800 rounded-sm cursor-pointer" @click="cancelChange">
           Отмена
         </button>
         <button
-          class="p-2.5 bg-purple-400 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          class="p-2.5 grow bg-purple-400 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="!newTask.content"
           @click="confirmChange(newTask)"
         >

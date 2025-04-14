@@ -9,19 +9,21 @@ const menuItems = [
 </script>
 
 <template>
-  <div class="flex justify-center gap-6 text-gray-400">
-    <RouterLink
-      replace
-      v-for="item in menuItems"
-      :to="{ name: item.routeName }"
-      class="font-sans font-medium"
-      activeClass="text-purple-400"
-    >
-      {{ item.title }}
-    </RouterLink>
-  </div>
+  <div class="p-2 md:p-5">
+    <div class="flex justify-around lg:justify-center sm:gap-6 text-gray-400 ">
+      <RouterLink
+        replace
+        v-for="item in menuItems"
+        :to="{ name: item.routeName }"
+        class="font-sans font-medium"
+        activeClass="text-purple-400"
+      >
+        {{ item.title }}
+      </RouterLink>
+    </div>
 
-  <RouterView />
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>

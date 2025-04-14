@@ -158,7 +158,7 @@ onMounted(() => {
     <input
       type="text"
       @input="debounceSearch"
-      class="border border-gray-400 placeholder:text-gray-400 w-full ml-9 p-2.5 rounded-sm"
+      class="outline-none border border-gray-400 placeholder:text-gray-400 w-full md:ml-9 p-2.5 rounded-sm"
       placeholder="Поиск по названию"
       v-model="inputTaskSearch"
     />
@@ -169,9 +169,11 @@ onMounted(() => {
     <!--      Поиск-->
     <!--    </button>-->
   </div>
-  <div class="mt-2.5 ml-9 flex justify-between border-gray-400">
-    <div>Фильтры:</div>
-    <div class="flex gap-2.5 items-stretch text-sm">
+  <div class="mt-2.5 md:ml-9 flex gap-1 justify-between border-gray-400 flex-col lg:flex-row">
+    <div class="lg:block">Фильтры:</div>
+    <div
+      class="flex gap-2.5 items-stretch text-sm text-center flex-col w-full lg:w-fit lg:flex-row"
+    >
       <div
         v-for="(priority, key) in settingsStore.taskPriorities"
         @click="changePrioritiesFilter(key)"
@@ -187,7 +189,7 @@ onMounted(() => {
       </div>
       <div class="flex border rounded-sm divide-x border-gray-400">
         <div
-          class="py-1 px-2.5 cursor-pointer border-gray-400"
+          class="py-1 px-2.5 cursor-pointer grow border-gray-400"
           :class="[filters.statusType === key ? 'text-purple-400 ' : '']"
           v-for="(status, key) in settingsStore.statusTypes"
           @click="changeStatusFilter(key)"
@@ -198,15 +200,14 @@ onMounted(() => {
     </div>
   </div>
   <div class="flex gap-2.5 mt-2.5">
-    <IconCheck :size="26" />
-    <TaskForm @createTask="createTask"></TaskForm>
+    <TaskForm class="md:ml-9" @createTask="createTask"></TaskForm>
   </div>
   <div>
     <div class="mt-4" v-for="task in slicedTaskArray">
       <div class="flex gap-2.5 items-center">
         <template v-if="editTaskId === task.id">
-          <IconCheck :size="26" />
           <TaskForm
+            class="md:ml-9"
             isEdit
             :task="task"
             @cancelChange="cancelChange"
