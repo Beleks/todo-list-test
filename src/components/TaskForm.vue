@@ -1,7 +1,7 @@
 <script setup>
 // TODO: {...props.task} - попробовать пересмотреть подход
 
-import { nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
 import { useSettingsStore } from '@/stores/settings.js'
 import { initEmptyTask } from '@/helpers/helper.js'
 import IconPriority from '@/components/icons/IconPriority.vue'
@@ -30,17 +30,18 @@ function choosePriority(priorityId) {
   newTask.value.priorityId = priorityId
 }
 
-function adjustHeight(textareaRef) {
-  textareaRef.style.height = 'auto'
-  textareaRef.style.height = `${textareaRef.scrollHeight}px`
-}
+// function adjustHeight(textareaRef) {
+//   textareaRef.style.height = 'auto'
+//   textareaRef.style.height = `${textareaRef.scrollHeight}px`
+// }
 
 function cancelChange() {
   emit('cancelChange')
   newTask.value = { ...props.task }
 }
 
-async function confirmChange(task) {
+// async
+function confirmChange(task) {
   // TODO: Убрать лишние пробелы, переносы строк?
   if (!task.content.length) {
     // Проверка нужна если вызывается через alt+enter
@@ -51,8 +52,8 @@ async function confirmChange(task) {
   } else {
     emit('createTask', task)
     newTask.value = { ...props.task }
-    await nextTick()
-    adjustHeight(taskContentArea.value)
+    // await nextTick()
+    // adjustHeight(taskContentArea.value)
   }
 }
 
@@ -64,7 +65,7 @@ function handleKeyupCode(event) {
 
 onMounted(() => {
   // newTask.value = { ...props.task }
-  adjustHeight(taskContentArea.value)
+  // adjustHeight(taskContentArea.value)
   taskContentArea.value.focus()
 })
 </script>
@@ -72,18 +73,17 @@ onMounted(() => {
 <template>
   <div class="p-2.5 border border-gray-400 rounded-sm w-full border-dashed">
     <!-- Корректно ли вешать adjustHeight на событие input? -->
-
-    <!-- @focus="onFocus"   -->
-    <textarea
+    <!-- rows="1" @input="adjustHeight(taskContentArea) "-->
+    <input
       ref="taskContentArea"
       class="block w-full placeholder:text-gray-400 focus:border-none outline-none resize-none"
       placeholder="Введите название задачи..."
-      rows="1"
-      @input="adjustHeight(taskContentArea)"
       @keyup.alt.enter="confirmChange(newTask)"
       @keyup.alt="handleKeyupCode"
       v-model="newTask.content"
-    ></textarea>
+      type="text"
+    />
+    <!--    <textarea></textarea>-->
     <div class="flex flex-col gap-1.5 items-stretch justify-between leading-4 mt-2.5 lg:flex-row">
       <div class="flex items-center w-full lg:w-fit gap-1 sm:gap-2.5">
         <div class="hidden lg:block">Приоритет:</div>
@@ -105,7 +105,11 @@ onMounted(() => {
       </div>
       <div class="flex gap-1 sm:gap-2.5 items-center font-medium w-full lg:w-fit">
         <!-- один метод confirmChange? -->
-        <button v-if="isEdit" class="p-2.5 grow bg-gray-800 rounded-sm cursor-pointer" @click="cancelChange">
+        <button
+          v-if="isEdit"
+          class="p-2.5 grow bg-gray-800 rounded-sm cursor-pointer"
+          @click="cancelChange"
+        >
           Отмена
         </button>
         <button
