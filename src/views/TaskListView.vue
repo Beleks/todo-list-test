@@ -1,20 +1,69 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch, watchEffect } from 'vue'
 import { useSettingsStore } from '@/stores/settings.js'
+import { debounce } from '@/helpers/helper.js'
 
 import IconCircle from '@/components/icons/IconCircle.vue'
 import IconCheck from '@/components/icons/IconCheck.vue'
 import IconTrash from '@/components/icons/IconTrash.vue'
-import TaskForm from '@/components/TaskForm.vue'
 import IconEdit from '@/components/icons/IconEdit.vue'
-
-// const taskContent = ref('')
+import TaskForm from '@/components/TaskForm.vue'
 
 const settingsStore = useSettingsStore()
 
+const filters = ref({
+  priorities: new Set(['1', '2']),
+  statusType: 'all',
+})
+
+const inputTaskSearch = ref('')
 const editTaskId = ref(null)
 
 const taskList = ref([])
+const filteredBySearch = ref([])
+
+watch(
+  taskList,
+  (newTaskList) => {
+    filteredBySearch.value = filteredByTaskContent(inputTaskSearch.value, newTaskList)
+  },
+  { deep: true },
+)
+
+function changePrioritiesFilter(priorityKey) {
+  if (filters.value.priorities.has(priorityKey)) {
+    filters.value.priorities.delete(priorityKey)
+  } else {
+    filters.value.priorities.add(priorityKey)
+  }
+}
+
+function changeStatusFilter(statusType) {
+  filters.value.statusType = statusType
+}
+
+const filteredTasks = computed(() => {
+  let result = filteredBySearch.value
+
+  if (filters.value.priorities.size) {
+    result = filteredBySearch.value.filter((task) => filters.value.priorities.has(task.priorityId))
+  }
+
+  result = result.filter((task)=> settingsStore.statusTypes[filters.value.statusType].checkQuality(task))
+  return result
+})
+
+const debounceSearch = debounce(() => {
+  filteredBySearch.value = filteredByTaskContent(inputTaskSearch.value, taskList.value)
+}, 300)
+
+function filteredByTaskContent(taskContentQuery, taskList) {
+  if (taskContentQuery.length) {
+    return taskList.filter((task) => task.content.includes(taskContentQuery))
+  } else {
+    return taskList
+  }
+}
 
 function showTaskForm(taskId) {
   editTaskId.value = taskId
@@ -25,7 +74,15 @@ function cancelChange() {
 }
 
 function saveEditTask(newTask) {
+  let currentTaskIndex = taskList.value.findIndex((task) => task.id === newTask.id)
+  if (currentTaskIndex === -1) {
+    return
+  }
 
+  taskList.value.splice(currentTaskIndex, 1, newTask)
+  saveTaskListToLS(taskList.value)
+
+  editTaskId.value = null
 }
 
 function createTask(task) {
@@ -62,23 +119,58 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>Поиск</div>
-  <div>Фильтры</div>
-  <div class="flex gap-2.5">
+  <div class="flex mt-6 gap-2.5">
+    <!-- @keyup.enter="debounceSearch" -->
+    <input
+      type="text"
+      @input="debounceSearch"
+      class="border border-gray-400 placeholder:text-gray-400 w-full ml-9 p-2.5 rounded-sm"
+      placeholder="Поиск по названию"
+      v-model="inputTaskSearch"
+    />
+    <!--    <button-->
+    <!--      class="py-2.5 px-6 font-medium bg-purple-400 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"-->
+    <!--      @click="debounceSearch"-->
+    <!--    >-->
+    <!--      Поиск-->
+    <!--    </button>-->
+  </div>
+  <div class="mt-2.5 ml-9 flex justify-between">
+    <div>Фильтры:</div>
+    <div class="flex gap-2.5">
+      <div
+        v-for="(priority, key) in settingsStore.taskPriorities"
+        @click="changePrioritiesFilter(key)"
+        :class="[filters.priorities.has(key) ? priority.activeClass : '']"
+      >
+        {{ priority.title }}
+      </div>
+      <div v-for="(status, key) in settingsStore.statusTypes" @click="changeStatusFilter(key)">
+        {{ status.title }}
+      </div>
+    </div>
+  </div>
+  <div class="flex gap-2.5 mt-2.5">
     <IconCheck :size="26" />
     <TaskForm @createTask="createTask"></TaskForm>
   </div>
   <div>
-    <div class="mt-4" v-for="task in taskList">
-      <div
-        class="flex gap-2.5 items-center"
-      >
+    <div class="mt-4" v-for="task in filteredTasks">
+      <div class="flex gap-2.5 items-center">
         <template v-if="editTaskId === task.id">
           <IconCheck :size="26" />
-          <TaskForm isEdit :task="task" @cancelChange="cancelChange" @editTask="saveEditTask"></TaskForm>
+          <TaskForm
+            isEdit
+            :task="task"
+            @cancelChange="cancelChange"
+            @editTask="saveEditTask"
+          ></TaskForm>
         </template>
         <template v-else>
-          <div class="cursor-pointer" :class="[settingsStore.taskPriorities[task.priorityId].class]">
+          <div
+            class="cursor-pointer"
+            :class="[settingsStore.taskPriorities[task.priorityId].class]"
+          >
             <IconCheck v-if="task.isReady" @click="task.isReady = !task.isReady" :size="26" />
             <IconCircle v-else @click="task.isReady = !task.isReady" :size="26" />
           </div>

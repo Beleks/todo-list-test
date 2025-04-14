@@ -1,6 +1,9 @@
 <script setup>
-import { nextTick, ref, useTemplateRef } from 'vue'
+// TODO: {...props.task} - попробовать пересмотреть подход
+
+import { nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { useSettingsStore } from '@/stores/settings.js'
+import { initEmptyTask } from '@/helpers/helper.js'
 
 const props = defineProps({
   isEdit: {
@@ -9,15 +12,18 @@ const props = defineProps({
   },
   task: {
     type: Object,
+    default() {
+      return initEmptyTask()
+    },
   },
 })
 
-const emit = defineEmits(['createTask', 'cancelChange'])
+const emit = defineEmits(['createTask', 'cancelChange', 'editTask'])
 
 const settingsStore = useSettingsStore()
 
 const taskContentArea = useTemplateRef('taskContentArea')
-const newTask = ref(initEmptyTask())
+const newTask = ref({ ...props.task }) // Учитываем что объект не глубокий
 
 function choosePriority(priorityId) {
   newTask.value.priorityId = priorityId
@@ -30,35 +36,30 @@ function adjustHeight(textareaRef) {
 
 function cancelChange() {
   emit('cancelChange')
-  newTask.value = initEmptyTask()
+  newTask.value = { ...props.task }
 }
 
 async function confirmChange(task) {
   // TODO: Убрать лишние пробелы, переносы строк?
-  // if (!task.content.length) {
-  //   return
-  // }
+  if (!task.content.length) {
+    // Проверка нужна если вызывается через alt+enter
+    return
+  }
   if (props.isEdit) {
     emit('editTask', task)
   } else {
     emit('createTask', task)
-    newTask.value = initEmptyTask()
+    newTask.value = { ...props.task }
+    await nextTick()
+    adjustHeight(taskContentArea.value)
   }
+}
 
-  await nextTick()
+onMounted(() => {
+  // newTask.value = { ...props.task }
   adjustHeight(taskContentArea.value)
-}
-
-function initEmptyTask() {
-  // priorityId -> priorityKey?
-  // Or set from props?
-  return {
-    id: null,
-    content: '',
-    priorityId: '1',
-    isReady: false,
-  }
-}
+  taskContentArea.value.focus()
+})
 </script>
 
 <template>

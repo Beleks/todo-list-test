@@ -20,5 +20,26 @@ export const useSettingsStore = defineStore('settings', () => {
     },
   })
 
-  return { taskPriorities }
+  const statusTypes = ref({
+    'all': {
+      title: 'Все задачи',
+      checkQuality() {
+        return true
+      }
+    },
+    'active': {
+      title: 'Активные',
+      checkQuality(task) {
+        return !task.isReady
+      }
+    },
+    'completed': {
+      title: 'Завершенные',
+      checkQuality(task) {
+        return task.isReady
+      }
+    },
+  })
+
+  return { taskPriorities, statusTypes }
 })
