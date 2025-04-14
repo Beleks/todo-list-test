@@ -17,6 +17,7 @@ const filters = ref({
 })
 
 const inputTaskSearch = ref('')
+const currentPage = ref(1)
 const editTaskId = ref(null)
 
 const taskList = ref([])
@@ -26,6 +27,14 @@ watch(
   taskList,
   (newTaskList) => {
     filteredBySearch.value = filteredByTaskContent(inputTaskSearch.value, newTaskList)
+  },
+  { deep: true },
+)
+
+watch(
+  [filters, inputTaskSearch],
+  () => {
+    currentPage.value = 1
   },
   { deep: true },
 )
@@ -49,8 +58,25 @@ const filteredTasks = computed(() => {
     result = filteredBySearch.value.filter((task) => filters.value.priorities.has(task.priorityId))
   }
 
-  result = result.filter((task)=> settingsStore.statusTypes[filters.value.statusType].checkQuality(task))
+  result = result.filter((task) =>
+    settingsStore.statusTypes[filters.value.statusType].checkQuality(task),
+  )
   return result
+})
+
+const totalPages = computed(() => Math.ceil(filteredTasks.value.length / settingsStore.tasksOnPage))
+
+const slicedTaskArray = computed(() => {
+  let start = (currentPage.value - 1) * settingsStore.tasksOnPage
+  let end = start + settingsStore.tasksOnPage
+  return filteredTasks.value.slice(start, end)
+})
+
+watch(slicedTaskArray, (newTaskArray)=>{
+  // Для перехода на предыдущую страницу, если на текущей нет задач
+  if (newTaskArray.length === 0 && currentPage.value !== 1) {
+    currentPage.value = currentPage.value - 1
+  }
 })
 
 const debounceSearch = debounce(() => {
@@ -155,7 +181,7 @@ onMounted(() => {
     <TaskForm @createTask="createTask"></TaskForm>
   </div>
   <div>
-    <div class="mt-4" v-for="task in filteredTasks">
+    <div class="mt-4" v-for="task in slicedTaskArray">
       <div class="flex gap-2.5 items-center">
         <template v-if="editTaskId === task.id">
           <IconCheck :size="26" />
@@ -195,7 +221,32 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <div>Пагинация</div>
+  <div v-show="slicedTaskArray.length" class="flex justify-center mt-4">
+    <div class="flex border rounded-sm divide-x *:w-10 *:p-2.5 *:cursor-pointer">
+      <button
+        class="disabled:cursor-not-allowed"
+        @click="currentPage--"
+        :disabled="currentPage <= 1"
+      >
+        <
+      </button>
+      <div
+        class="p-2.5 text-center"
+        :class="[currentPage === page ? 'bg-purple-400' : '']"
+        v-for="page in totalPages"
+        @click="currentPage = page"
+      >
+        {{ page }}
+      </div>
+      <button
+        class="disabled:cursor-not-allowed"
+        @click="currentPage++"
+        :disabled="currentPage >= totalPages"
+      >
+        >
+      </button>
+    </div>
+  </div>
 </template>
 
 <style scoped></style>

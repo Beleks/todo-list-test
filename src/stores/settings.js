@@ -41,5 +41,7 @@ export const useSettingsStore = defineStore('settings', () => {
     },
   })
 
-  return { taskPriorities, statusTypes }
+  const tasksOnPage = ref(3)
+
+  return { taskPriorities, statusTypes, tasksOnPage }
 })
