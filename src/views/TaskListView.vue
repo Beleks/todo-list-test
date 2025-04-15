@@ -1,7 +1,9 @@
 <script setup>
-import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { toast } from 'vue3-toastify'
+
 import { useSettingsStore } from '@/stores/settings.js'
+import { useTasksStore } from '@/stores/tasks.js'
 import { debounce } from '@/helpers/helper.js'
 
 import IconCircle from '@/components/icons/IconCircle.vue'
@@ -12,6 +14,7 @@ import TaskForm from '@/components/TaskForm.vue'
 import IconPriority from '@/components/icons/IconPriority.vue'
 
 const settingsStore = useSettingsStore()
+const tasksStore = useTasksStore()
 
 const filters = ref({
   priorities: new Set(['2', '3']),
@@ -22,15 +25,15 @@ const inputTaskSearch = ref('')
 const currentPage = ref(1)
 const editTaskId = ref(null)
 
-const taskList = ref([])
+const allTasks = tasksStore.allTasks
 const filteredBySearch = ref([])
 
 watch(
-  taskList,
+  allTasks,
   (newTaskList) => {
     filteredBySearch.value = filteredByTaskContent(inputTaskSearch.value, newTaskList)
   },
-  { deep: true },
+  { deep: true, immediate: true },
 )
 
 watch(
@@ -82,7 +85,7 @@ watch(slicedTaskArray, (newTaskArray) => {
 })
 
 const debounceSearch = debounce(() => {
-  filteredBySearch.value = filteredByTaskContent(inputTaskSearch.value, taskList.value)
+  filteredBySearch.value = filteredByTaskContent(inputTaskSearch.value, allTasks)
 }, 300)
 
 function filteredByTaskContent(taskContentQuery, taskList) {
@@ -101,55 +104,24 @@ function cancelChange() {
   editTaskId.value = null
 }
 
-function saveEditTask(newTask) {
-  let currentTaskIndex = taskList.value.findIndex((task) => task.id === newTask.id)
-  if (currentTaskIndex === -1) {
-    return
-  }
+function onCreateTask(newTask) {
+  tasksStore.createTask(newTask)
+}
 
-  taskList.value.splice(currentTaskIndex, 1, newTask)
-  saveTaskListToLS(taskList.value)
-
+function onSaveEditTask(newTask) {
+  tasksStore.saveEditTask(newTask)
   editTaskId.value = null
 }
 
-function createTask(task) {
-  task.id = generateId()
-  taskList.value.unshift(task)
-  saveTaskListToLS(taskList.value)
-}
-
 function completeTask(task) {
-  task.isReady = true
+  tasksStore.completeTask(task)
   toast.success('Задача выполнена!')
 }
 
-function saveTaskListToLS(taskList) {
-  localStorage.setItem('tasks', JSON.stringify(taskList))
-}
-
-function deleteTask(taskId) {
-  let currentTaskIndex = taskList.value.findIndex((task) => task.id === taskId)
-  if (currentTaskIndex === -1) {
-    return
-  }
-
+function onDeleteTask(taskId) {
+  tasksStore.deleteTaskById(taskId)
   toast('Задача удалена')
-  taskList.value.splice(currentTaskIndex, 1)
-  saveTaskListToLS(taskList.value)
 }
-
-function generateId() {
-  return 'id-' + Date.now() + '-' + Math.floor(Math.random() * 1000)
-}
-
-onMounted(() => {
-  let taskListFromLS = JSON.parse(localStorage.getItem('tasks'))
-
-  if (taskListFromLS) {
-    taskList.value = taskListFromLS
-  }
-})
 </script>
 
 <template>
@@ -200,7 +172,7 @@ onMounted(() => {
     </div>
   </div>
   <div class="flex gap-2.5 mt-2.5">
-    <TaskForm class="md:ml-9" @createTask="createTask"></TaskForm>
+    <TaskForm class="md:ml-9" @createTask="onCreateTask"></TaskForm>
   </div>
   <div>
     <div class="mt-4" v-for="task in slicedTaskArray">
@@ -211,7 +183,7 @@ onMounted(() => {
             isEdit
             :task="task"
             @cancelChange="cancelChange"
-            @editTask="saveEditTask"
+            @editTask="onSaveEditTask(task)"
           ></TaskForm>
         </template>
         <template v-else>
@@ -235,7 +207,7 @@ onMounted(() => {
               <IconTrash
                 :size="24"
                 class="stroke-red-400 cursor-pointer"
-                @click="deleteTask(task.id)"
+                @click="onDeleteTask(task.id)"
               />
             </div>
           </div>

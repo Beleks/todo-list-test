@@ -30,11 +30,6 @@ function choosePriority(priorityId) {
   newTask.value.priorityId = priorityId
 }
 
-// function adjustHeight(textareaRef) {
-//   textareaRef.style.height = 'auto'
-//   textareaRef.style.height = `${textareaRef.scrollHeight}px`
-// }
-
 function cancelChange() {
   emit('cancelChange')
   newTask.value = { ...props.task }
