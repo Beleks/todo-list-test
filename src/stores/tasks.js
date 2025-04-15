@@ -20,12 +20,14 @@ export const useTasksStore = defineStore('tasks', () => {
   }
 
   function saveEditTask(newTask) {
-    let currentTaskIndex = allTasks.findIndex((task) => task.id === newTask.id)
+    let currentTaskIndex = allTasks.value.findIndex((task) => task.id === newTask.id)
+
+    console.log(currentTaskIndex)
     if (currentTaskIndex === -1) {
       return
     }
 
-    allTasks.splice(currentTaskIndex, 1, newTask)
+    allTasks.value.splice(currentTaskIndex, 1, newTask)
   }
 
   function deleteTaskById(taskId) {

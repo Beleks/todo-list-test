@@ -181,7 +181,7 @@ function onDeleteTask(taskId) {
             isEdit
             :task="task"
             @cancelChange="cancelChange"
-            @editTask="onSaveEditTask(task)"
+            @editTask="onSaveEditTask"
           ></TaskForm>
         </template>
         <template v-else>
