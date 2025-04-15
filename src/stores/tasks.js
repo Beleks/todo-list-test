@@ -4,6 +4,8 @@ import { defineStore } from 'pinia'
 import { saveTaskListToLS, getTaskListFromLS, generateTaskId } from '@/helpers/helper.js'
 
 export const useTasksStore = defineStore('tasks', () => {
+  // TODO: объединить saveEditTask и deleteTaskById?
+
   const allTasks = ref(getTaskListFromLS())
 
   watch(
@@ -16,13 +18,15 @@ export const useTasksStore = defineStore('tasks', () => {
 
   function createTask(newTask) {
     newTask.id = generateTaskId()
-    allTasks.value.unshift(newTask)
+    addTasks([newTask])
+  }
+  
+  function addTasks(newTaskArr) {
+    allTasks.value.unshift(...newTaskArr)
   }
 
   function saveEditTask(newTask) {
     let currentTaskIndex = allTasks.value.findIndex((task) => task.id === newTask.id)
-
-    console.log(currentTaskIndex)
     if (currentTaskIndex === -1) {
       return
     }
@@ -46,6 +50,7 @@ export const useTasksStore = defineStore('tasks', () => {
   return {
     allTasks,
     createTask,
+    addTasks,
     deleteTaskById,
     saveEditTask,
     completeTask,

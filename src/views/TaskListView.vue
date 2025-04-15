@@ -193,7 +193,7 @@ function onDeleteTask(taskId) {
             <IconCircle v-else @click="onCompleteTask(task)" :size="26" />
           </div>
           <div class="flex justify-between p-2.5 border border-gray-400 rounded-sm w-full">
-            <div>
+            <div :class="task.isReady ? 'line-through' : ''">
               {{ task.content }}
             </div>
             <div class="flex gap-2.5 stroke-2">

@@ -23,7 +23,7 @@ const emit = defineEmits(['createTask', 'cancelChange', 'editTask'])
 
 const settingsStore = useSettingsStore()
 
-const taskContentArea = useTemplateRef('taskContentArea')
+const taskContentInput = useTemplateRef('taskContentInput')
 const newTask = ref({ ...props.task }) // Учитываем что объект не глубокий
 
 function choosePriority(priorityId) {
@@ -59,9 +59,7 @@ function handleKeyupCode(event) {
 }
 
 onMounted(() => {
-  // newTask.value = { ...props.task }
-  // adjustHeight(taskContentArea.value)
-  taskContentArea.value.focus()
+  taskContentInput.value.focus()
 })
 </script>
 
@@ -70,7 +68,7 @@ onMounted(() => {
     <!-- Корректно ли вешать adjustHeight на событие input? -->
     <!-- rows="1" @input="adjustHeight(taskContentArea) "-->
     <input
-      ref="taskContentArea"
+      ref="taskContentInput"
       class="block w-full placeholder:text-gray-400 focus:border-none outline-none resize-none"
       placeholder="Введите название задачи..."
       @keyup.alt.enter="confirmChange(newTask)"
