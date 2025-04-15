@@ -126,7 +126,6 @@ function onDeleteTask(taskId) {
 
 <template>
   <div class="flex mt-6 gap-2.5">
-    <!-- @keyup.enter="debounceSearch" -->
     <input
       type="text"
       @input="debounceSearch"
@@ -136,7 +135,6 @@ function onDeleteTask(taskId) {
     />
     <!--    <button-->
     <!--      class="py-2.5 px-6 font-medium bg-purple-400 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"-->
-    <!--      @click="debounceSearch"-->
     <!--    >-->
     <!--      Поиск-->
     <!--    </button>-->
