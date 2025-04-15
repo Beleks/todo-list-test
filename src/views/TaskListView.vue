@@ -113,7 +113,7 @@ function onSaveEditTask(newTask) {
   editTaskId.value = null
 }
 
-function completeTask(task) {
+function onCompleteTask(task) {
   tasksStore.completeTask(task)
   toast.success('Задача выполнена!')
 }
@@ -190,7 +190,7 @@ function onDeleteTask(taskId) {
             :class="[settingsStore.taskPriorities[task.priorityId].class]"
           >
             <IconCheck v-if="task.isReady" @click="task.isReady = false" :size="26" />
-            <IconCircle v-else @click="completeTask(task)" :size="26" />
+            <IconCircle v-else @click="onCompleteTask(task)" :size="26" />
           </div>
           <div class="flex justify-between p-2.5 border border-gray-400 rounded-sm w-full">
             <div>
