@@ -20,7 +20,7 @@ export const useTasksStore = defineStore('tasks', () => {
     newTask.id = generateTaskId()
     addTasks([newTask])
   }
-  
+
   function addTasks(newTaskArr) {
     allTasks.value.unshift(...newTaskArr)
   }
@@ -43,8 +43,8 @@ export const useTasksStore = defineStore('tasks', () => {
     allTasks.value.splice(currentTaskIndex, 1)
   }
 
-  function completeTask(task) {
-    task.isReady = true
+  function changeTaskStatus(task, isReady) {
+    task.isReady = isReady
   }
 
   return {
@@ -53,6 +53,6 @@ export const useTasksStore = defineStore('tasks', () => {
     addTasks,
     deleteTaskById,
     saveEditTask,
-    completeTask,
+    changeTaskStatus,
   }
 })

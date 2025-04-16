@@ -90,7 +90,9 @@ const debounceSearch = debounce(() => {
 
 function filteredByTaskContent(taskContentQuery, taskList) {
   if (taskContentQuery.length) {
-    return taskList.filter((task) => task.content.includes(taskContentQuery))
+    return taskList.filter((task) =>
+      task.content.toLowerCase().includes(taskContentQuery.toLowerCase()),
+    )
   } else {
     return taskList
   }
@@ -113,9 +115,11 @@ function onSaveEditTask(newTask) {
   editTaskId.value = null
 }
 
-function onCompleteTask(task) {
-  tasksStore.completeTask(task)
-  toast.success('Задача выполнена!')
+function onChangeTaskStatus(task, isReady) {
+  tasksStore.changeTaskStatus(task, isReady)
+  if (isReady) {
+    toast.success('Задача выполнена!')
+  }
 }
 
 function onDeleteTask(taskId) {
@@ -131,13 +135,8 @@ function onDeleteTask(taskId) {
       @input="debounceSearch"
       class="outline-none border border-gray-400 placeholder:text-gray-400 w-full md:ml-9 p-2.5 rounded-sm"
       placeholder="Поиск по названию"
-      v-model="inputTaskSearch"
+      v-model.trim="inputTaskSearch"
     />
-    <!--    <button-->
-    <!--      class="py-2.5 px-6 font-medium bg-purple-400 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"-->
-    <!--    >-->
-    <!--      Поиск-->
-    <!--    </button>-->
   </div>
   <div class="mt-2.5 md:ml-9 flex gap-1 justify-between border-gray-400 flex-col lg:flex-row">
     <div class="lg:block">Фильтры:</div>
@@ -189,8 +188,8 @@ function onDeleteTask(taskId) {
             class="cursor-pointer stroke-2"
             :class="[settingsStore.taskPriorities[task.priorityId].class]"
           >
-            <IconCheck v-if="task.isReady" @click="task.isReady = false" :size="26" />
-            <IconCircle v-else @click="onCompleteTask(task)" :size="26" />
+            <IconCheck v-if="task.isReady" @click="onChangeTaskStatus(task, false)" :size="26" />
+            <IconCircle v-else @click="onChangeTaskStatus(task, true)" :size="26" />
           </div>
           <div class="flex justify-between p-2.5 border border-gray-400 rounded-sm w-full">
             <div :class="task.isReady ? 'line-through' : ''">
@@ -222,7 +221,7 @@ function onDeleteTask(taskId) {
       >
         <
       </button>
-      <!-- TODO: Ограничения по кол-ву видимых страниц? -->
+      <!-- TODO: Ограничения по кол-ву видимых страниц -->
       <div
         class="p-2.5 text-center"
         :class="[currentPage === page ? 'bg-purple-400' : '']"

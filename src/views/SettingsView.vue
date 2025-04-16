@@ -1,5 +1,10 @@
 <script setup>
-import {adjustHeight, getJSONTaskListFromLS, handleImportTasks, isArrayOfObjects} from '@/helpers/helper.js'
+import {
+  adjustHeight,
+  getJSONTaskListFromLS,
+  handleImportTasks,
+  isArrayOfObjects,
+} from '@/helpers/helper.js'
 import { useTemplateRef } from 'vue'
 import { toast } from 'vue3-toastify'
 import { useTasksStore } from '@/stores/tasks.js'

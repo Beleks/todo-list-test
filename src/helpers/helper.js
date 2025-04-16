@@ -78,13 +78,7 @@ function getJSONTaskListFromLS() {
 }
 
 function getTaskListFromLS() {
-  let taskListFromLS = JSON.parse(getJSONTaskListFromLS())
-
-  if (taskListFromLS) {
-    return JSON.parse(localStorage.getItem('tasks'))
-  } else {
-    return []
-  }
+  return JSON.parse(getJSONTaskListFromLS()) || []
 }
 
 export {
