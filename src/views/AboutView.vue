@@ -1,13 +1,15 @@
-<template>Какое-то описание</template>
+<script setup>
+const versionApp = __APP_VERSION__
+</script>
 
-<style>
-/*
-@media (min-width: 1024px) {
-  .about {
-   min-height: 100vh;
-   display: flex;
-   align-items: center;
-  }
-}
-*/
-</style>
+<template>
+  <div>{{ $t('version') }}: {{ versionApp }}</div>
+  <!-- Смышлёный, но тестовое без unit-тестов... :( -->
+  <!-- [+] TODO: Самому установить дедлайн  -->
+  <!-- [+] TODO: Не успеть к дедлайну -->
+  <!-- [+] TODO: Не писать тесты, чтобы не срывать дедлайн -->
+  <!-- [ ] TODO: Попробовать дописать тесты после того как скинул на проверку -->
+  <div>{{ $t('razrabTestovogo') }}: Смышлёный Алексей Кандидатович</div>
+</template>
+
+<style></style>
