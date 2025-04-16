@@ -1,10 +1,10 @@
 <script setup>
-import { useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 const menuItems = [
-  { title: 'Список задач', routeName: 'taskList' },
-  { title: 'Настройки', routeName: 'settings' },
-  { title: 'О проекте', routeName: 'about' },
+  { title: 'taskList', routeName: 'taskList' },
+  { title: 'settings', routeName: 'settings' },
+  { title: 'aboutProject', routeName: 'about' },
 ]
 </script>
 
@@ -18,7 +18,7 @@ const menuItems = [
         class="font-sans font-medium"
         activeClass="text-purple-400"
       >
-        {{ item.title }}
+        {{ $t(item.title)}}
       </RouterLink>
     </div>
 

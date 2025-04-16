@@ -1,4 +1,7 @@
 import { useSettingsStore } from '@/stores/settings.js'
+import i18n from '@/i18n/index.js'
+
+const { t } = i18n.global
 
 function initEmptyTask() {
   // priorityId -> priorityKey?
@@ -31,7 +34,7 @@ function handleImportTasks(tasks) {
           if (task[key] in settingsStore.taskPriorities) {
             transformedTask[key] = task[key]
           } else {
-            throw new Error(`Неверное значение ${key}: ${task[key]}`)
+            throw new Error(t('errorKey', { key: key, keyValue: task[key] }))
           }
           break
         case 'isReady':
@@ -39,7 +42,7 @@ function handleImportTasks(tasks) {
           break
         default:
           if (task[key] === undefined) {
-            throw new Error(`Отсутствует поле ${key}`)
+            throw new Error(t('errorMissKey', { key: key }))
           }
           transformedTask[key] = task[key]
           break

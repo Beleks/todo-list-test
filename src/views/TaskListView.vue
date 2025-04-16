@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { toast } from 'vue3-toastify'
+import { useI18n } from 'vue-i18n'
 
 import { useSettingsStore } from '@/stores/settings.js'
 import { useTasksStore } from '@/stores/tasks.js'
@@ -15,6 +16,7 @@ import IconPriority from '@/components/icons/IconPriority.vue'
 
 const settingsStore = useSettingsStore()
 const tasksStore = useTasksStore()
+const { t } = useI18n()
 
 const filters = ref({
   priorities: new Set(['2', '3']),
@@ -118,13 +120,13 @@ function onSaveEditTask(newTask) {
 function onChangeTaskStatus(task, isReady) {
   tasksStore.changeTaskStatus(task, isReady)
   if (isReady) {
-    toast.success('Задача выполнена!')
+    toast.success(t('taskIsReady'))
   }
 }
 
 function onDeleteTask(taskId) {
   tasksStore.deleteTaskById(taskId)
-  toast('Задача удалена')
+  toast(t('taskDelete'))
 }
 </script>
 
@@ -134,12 +136,12 @@ function onDeleteTask(taskId) {
       type="text"
       @input="debounceSearch"
       class="outline-none border border-gray-400 placeholder:text-gray-400 w-full md:ml-9 p-2.5 rounded-sm"
-      placeholder="Поиск по названию"
+      :placeholder="t('searchTaskPlaceholder')"
       v-model.trim="inputTaskSearch"
     />
   </div>
   <div class="mt-2.5 md:ml-9 flex gap-1 justify-between border-gray-400 flex-col lg:flex-row">
-    <div class="lg:block">Фильтры:</div>
+    <div class="lg:block">{{t('filters')}}:</div>
     <div
       class="flex gap-2.5 items-stretch text-sm text-center flex-col w-full lg:w-fit lg:flex-row"
     >

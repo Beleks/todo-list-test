@@ -1,47 +1,58 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
 export const useSettingsStore = defineStore('settings', () => {
-  const taskPriorities = ref({
-    1: {
-      title: 'Низкий',
-      class: 'stroke-blue-400',
-      activeClass: 'text-blue-400',
-    },
-    2: {
-      title: 'Средний',
-      class: 'stroke-yellow-400',
-      activeClass: 'text-yellow-400',
-    },
-    3: {
-      title: 'Высокий',
-      class: 'stroke-red-400',
-      activeClass: 'text-red-400',
-    },
+  const { t, locale } = useI18n({ useScope: 'global' })
+
+  const taskPriorities = computed(() => {
+    return {
+      1: {
+        title: t('lowPriority'),
+        class: 'stroke-blue-400',
+        activeClass: 'text-blue-400',
+      },
+      2: {
+        title: t('middlePriority'),
+        class: 'stroke-yellow-400',
+        activeClass: 'text-yellow-400',
+      },
+      3: {
+        title: t('highPriority'),
+        class: 'stroke-red-400',
+        activeClass: 'text-red-400',
+      },
+    }
   })
 
-  const statusTypes = ref({
-    all: {
-      title: 'Все задачи',
-      checkQuality() {
-        return true
+  const statusTypes = computed(() => {
+    return {
+      all: {
+        title: t('allTasks'),
+        checkQuality() {
+          return true
+        },
       },
-    },
-    active: {
-      title: 'Активные',
-      checkQuality(task) {
-        return !task.isReady
+      active: {
+        title: t('activeTask'),
+        checkQuality(task) {
+          return !task.isReady
+        },
       },
-    },
-    completed: {
-      title: 'Завершенные',
-      checkQuality(task) {
-        return task.isReady
+      completed: {
+        title: t('inactiveTask'),
+        checkQuality(task) {
+          return task.isReady
+        },
       },
-    },
+    }
   })
 
   const tasksOnPage = ref(3)
 
-  return { taskPriorities, statusTypes, tasksOnPage }
+  function changeLocale(newValue) {
+    locale.value = newValue
+  }
+
+  return { taskPriorities, statusTypes, tasksOnPage, locale, changeLocale }
 })

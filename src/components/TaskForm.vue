@@ -35,7 +35,6 @@ function cancelChange() {
   newTask.value = { ...props.task }
 }
 
-// async
 function confirmChange(task) {
   // TODO: Убрать лишние пробелы, переносы строк?
   if (!task.content.length) {
@@ -47,8 +46,6 @@ function confirmChange(task) {
   } else {
     emit('createTask', task)
     newTask.value = { ...props.task }
-    // await nextTick()
-    // adjustHeight(taskContentArea.value)
   }
 }
 
@@ -66,11 +63,10 @@ onMounted(() => {
 <template>
   <div class="p-2.5 border border-gray-400 rounded-sm w-full border-dashed">
     <!-- Корректно ли вешать adjustHeight на событие input? -->
-    <!-- rows="1" @input="adjustHeight(taskContentArea) "-->
     <input
       ref="taskContentInput"
       class="block w-full placeholder:text-gray-400 focus:border-none outline-none resize-none"
-      placeholder="Введите название задачи..."
+      :placeholder="$t('createTaskPlaceholder')"
       @keyup.alt.enter="confirmChange(newTask)"
       @keyup.alt="handleKeyupCode"
       v-model="newTask.content"
@@ -79,7 +75,7 @@ onMounted(() => {
     <!--    <textarea></textarea>-->
     <div class="flex flex-col gap-1.5 items-stretch justify-between leading-4 mt-2.5 lg:flex-row">
       <div class="flex items-center w-full lg:w-fit gap-1 sm:gap-2.5">
-        <div class="hidden lg:block">Приоритет:</div>
+        <div class="hidden lg:block"> {{$t('priority')}}:</div>
         <div
           v-for="(priority, key) in settingsStore.taskPriorities"
           @click="choosePriority(key)"
@@ -97,20 +93,19 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex gap-1 sm:gap-2.5 items-center font-medium w-full lg:w-fit">
-        <!-- один метод confirmChange? -->
         <button
           v-if="isEdit"
           class="p-2.5 grow bg-gray-800 rounded-sm cursor-pointer"
           @click="cancelChange"
         >
-          Отмена
+          {{ $t('cancel') }}
         </button>
         <button
           class="p-2.5 grow bg-purple-400 rounded-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="!newTask.content"
           @click="confirmChange(newTask)"
         >
-          {{ isEdit ? 'Сохранить изменения' : 'Добавить задачу' }}
+          {{ isEdit ? $t('saveChange') : $t('addTask') }}
         </button>
       </div>
     </div>

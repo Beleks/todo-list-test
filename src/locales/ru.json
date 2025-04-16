@@ -6,6 +6,7 @@
   "createTaskPlaceholder": "Введите название задачи...",
   "importTaskPlaceholder": "Ведите сюда список задач в формате JSON",
   "priority": "Приоритет",
+  "filters": "Фильтры",
   "highPriority": "Высокий",
   "middlePriority": "Средний",
   "lowPriority": "Низкий",
