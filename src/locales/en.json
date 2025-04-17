@@ -6,7 +6,7 @@
   "createTaskPlaceholder": "Enter a task name...",
   "importTaskPlaceholder": "List your tasks here in JSON format",
   "priority": "Priority",
-  "filters": "Фильтры",
+  "filters": "Filters",
   "highPriority": "High",
   "middlePriority": "Medium",
   "lowPriority": "Low",
