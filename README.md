@@ -23,21 +23,21 @@
     pnpm install
 Запуск в режиме dev
 
-    npm dev
+    npm run dev
     // или
-    pnpm dev
+    pnpm run dev
 
 Сборка проекта
 
-    npm build
+    npm run build
     // или
-    pnpm build
+    pnpm run build
 Запуск тестов.
 ~~Были бы тесты~~
 
-    npm test:unit
+    npm run test:unit
     // или
-    pnpm test:unit
+    pnpm run test:unit
 
 
 
