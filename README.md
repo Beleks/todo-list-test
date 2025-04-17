@@ -1,51 +1,78 @@
-# todo-list-test
+# To-Do List
+Приложение  для работы с задачами
 
-This template should help get you started developing with Vue 3 in Vite.
+Функционал:
+- Создание, удаление, редактирование задач.
+- Фильтрация и поиск по задачам
+- Сохранение задач на устройстве (с использованием LocalStorage)
+- Управление приоритетом задач
+- Экспорт и Импорт задач в формате JSON
+- Возможность переключить язык (Rus/Eng)
 
-## Recommended IDE Setup
+Не любите тянуться за мышкой?
+`alt + Enter` - создать/сохранить задачу
+`alt + [ 1, 2, 3 ]` - для быстрого выбора приоритета при создании и редактировании
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Есть небольшая валидация при импорте задач в JSON
 
-## Customize configuration
+## Установка
+Установка
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+    npm install
+    // или
+    pnpm install
+Запуск в режиме dev
 
-## Project Setup
+    npm dev
+    // или
+    pnpm dev
 
-```sh
-pnpm install
-```
+Сборка проекта
 
-### Compile and Hot-Reload for Development
+    npm build
+    // или
+    pnpm build
+Запуск тестов.
+~~Были бы тесты~~
 
-```sh
-pnpm dev
-```
+    npm test:unit
+    // или
+    pnpm test:unit
 
-### Compile and Minify for Production
 
-```sh
-pnpm build
-```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
 
-```sh
-pnpm test:unit
-```
+## Используемые технологии
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+- [Vue 3](vuejs.org)
+-  [Vite](https://vite.dev/) - для сборки проекта
+- [TailwindCSS](https://tailwindcss.com/) - CSS фреймворк
+- [Vue-Router](https://router.vuejs.org) - маршрутизация
+- [Pinia](https://pinia.vuejs.org/) - удобное управление глобальным
+  состоянием приложения
+- [vue-i18n](https://vue-i18n.intlify.dev/) - управление локализацией
+- [vue3-toastify](https://www.npmjs.com/package/vue3-toastify) - реализация уведомлений
+- [Vitest](https://vitest.dev/) - для написания тестов (которые не написаны)
 
-```sh
-pnpm test:e2e:dev
-```
+## Структура проекта
+Решил сильно не мудрить в организации файлов, проект простой.
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
+**src:**
+-  `assets` - css файлы, какие-то картинки, шрифты
+- `components` - все компоненты.
+-   `components/icons` - svg иконки обёрнутые во vue-компонеты. Для удобной работы со параметрами в svg (width, height)
+- `helpers` - для вспомогательных методов, которые могут понадобиться в разных компонентах. Так же тут организована работа с LS, методов не так много, не стал дробить на разные файлы.
+-   `i18n` - для корректной работы i18n в .js файлах
+-   `locales` - json файлы с переводом
+-   `router` - описание маршрутов для Vue-Router
+-    `stores` - модули хранилища Pinia
+-   `views` - страницы
 
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
+## Комментарии
+Не получили должного внимания след. аспекты:
 
-```sh
-pnpm build
-pnpm test:e2e
-```
+- в TaskListView код можно разбить еще на компоненты (задача, фильтры ...)
+- Стили плохо организовал, где-то можно было написать компактнее и не иметь полотно классов у тегов. Сразу не видел общей картины, поэтому писал как идёт.
+- Экспорт идёт сразу всех задач и не в виде файла, а в буфер обмена у которого есть ограничения. В проекте это никак не обрабатывается.
+
+Буду рад обратной связи по тестовому, в особенности по ошибкам, на которые сам не указал.
