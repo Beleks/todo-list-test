@@ -75,7 +75,7 @@ onMounted(() => {
     <!--    <textarea></textarea>-->
     <div class="flex flex-col gap-1.5 items-stretch justify-between leading-4 mt-2.5 lg:flex-row">
       <div class="flex items-center w-full lg:w-fit gap-1 sm:gap-2.5">
-        <div class="hidden lg:block"> {{$t('priority')}}:</div>
+        <div class="hidden lg:block">{{ $t('priority') }}:</div>
         <div
           v-for="(priority, key) in settingsStore.taskPriorities"
           @click="choosePriority(key)"

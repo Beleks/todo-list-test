@@ -141,7 +141,7 @@ function onDeleteTask(taskId) {
     />
   </div>
   <div class="mt-2.5 md:ml-9 flex gap-1 justify-between border-gray-400 flex-col lg:flex-row">
-    <div class="lg:block">{{t('filters')}}:</div>
+    <div class="lg:block">{{ t('filters') }}:</div>
     <div
       class="flex gap-2.5 items-stretch text-sm text-center flex-col w-full lg:w-fit lg:flex-row"
     >

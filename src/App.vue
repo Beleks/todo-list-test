@@ -18,7 +18,7 @@ const menuItems = [
         class="font-sans font-medium"
         activeClass="text-purple-400"
       >
-        {{ $t(item.title)}}
+        {{ $t(item.title) }}
       </RouterLink>
     </div>
 
